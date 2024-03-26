@@ -1,7 +1,30 @@
 import { Elysia } from "elysia";
+import { swagger } from "@elysiajs/swagger";
+import { cors } from "@elysiajs/cors";
+// Database
+import { mongoDBConnect } from "./database/mongo";
+// Router
+import router from "./routes";
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+const app = new Elysia();
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+app.use(cors(/* your options */));
+
+mongoDBConnect();
+
+app.use(
+  swagger({
+    documentation: {
+      info: {
+        title: "Dollars Documentation",
+        version: "2.4.3",
+      },
+    },
+  })
 );
+
+app.use(router);
+
+app.listen(4000, () => {
+  console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+});
