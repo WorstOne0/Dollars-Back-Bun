@@ -15,12 +15,14 @@
     "mongoose": "^8.2.3",
     "node-steam-openid": "^1.2.3",
     "open": "^10.1.0",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "bun-types": "^1.0.35",
-    "@types/node-steam-openid": "^1.0.3"
+    "@types/node-steam-openid": "^1.0.3",
+    "@types/uuid": "^9.0.8",
+    "bun-types": "^1.0.35"
   },
   "module": "src/index.js",
   "bun-create": {

@@ -1,7 +1,12 @@
 import { Schema, model } from "mongoose";
+import { v4 } from "uuid";
 
 const UserSchema = new Schema(
   {
+    _id: {
+      type: String,
+      default: v4,
+    },
     // User
     email: {
       type: String,
@@ -34,21 +39,8 @@ const UserSchema = new Schema(
     thumbnail: {
       type: String,
     },
-    // Steam Profile
-    steamId: {
-      type: String,
-    },
-    // Dates
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now(),
-    },
   },
   { timestamps: true }
 );
 
-export default model("User", UserSchema);
+export default model("user", UserSchema);

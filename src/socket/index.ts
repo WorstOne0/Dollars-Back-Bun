@@ -1,16 +1,18 @@
 import { Server } from "socket.io";
 import { joinRoom, leaveRoom } from "./rooms.js";
 
+import { Elysia } from "elysia";
+
 let io: any;
 
 const socketServer = (server: any) => {
-  io = new Server(server, {
+  io = new Server(4001, {
     path: "/socket_server",
     cors: {
       origin: true,
       credentials: true,
     },
-    transports: ["websocket", "polling"],
+    transports: ["websocket"],
     allowEIO3: true,
     pingTimeout: 10000,
   });

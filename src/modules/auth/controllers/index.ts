@@ -27,7 +27,6 @@ authController.guard(
           }
 
           const accessToken = await jwt.sign({ user: JSON.stringify(user) });
-          console.log("accessToken", accessToken);
 
           return {
             status: 200,

@@ -5,6 +5,7 @@ import { cors } from "@elysiajs/cors";
 import { mongoDBConnect } from "./database/mongo";
 // Router
 import router from "./routes";
+import { socketServer } from "./socket";
 
 const app = new Elysia();
 
@@ -25,6 +26,8 @@ app.use(
 
 app.use(router);
 
-app.listen(4000, () => {
+const server = app.listen(4000, () => {
   console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 });
+
+// socketServer(server.server);
