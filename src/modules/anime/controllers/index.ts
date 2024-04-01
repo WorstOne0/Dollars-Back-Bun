@@ -1,7 +1,8 @@
 import { Elysia } from "elysia";
-import { challenge } from "@src/utils/o_auth_2_utils";
-// Middleware
+// Service
 import authService from "@src/services/auth_service";
+// Utils
+import { challenge } from "@src/utils/o_auth_2_utils";
 
 const animeController = new Elysia().use(authService);
 

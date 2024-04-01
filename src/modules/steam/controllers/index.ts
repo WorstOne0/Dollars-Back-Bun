@@ -1,48 +1,77 @@
 // NPM Packages
 import { Elysia } from "elysia";
 import SteamAuth from "node-steam-openid";
-import open from "open";
-// Middleware
+// Service
 import authService from "@src/services/auth_service";
+// Models
+import SteamUser from "../models";
 
 const steamController = new Elysia().use(authService);
 
-const steamAuth = new SteamAuth({
-  realm: "http://localhost:4000",
-  returnUrl: "http://localhost:4000/steam/connnectSteamAccountReciever",
-  apiKey: process.env.STEAM_API_KEY as string,
-});
+steamController
+  .get("/steam/link_steam_account_reciever/:_id", async ({ request, params, error }) => {
+    try {
+      const steamResponse = await new SteamAuth({
+        realm: `${process.env.HOST}:${process.env.PORT}`,
+        returnUrl: `${process.env.HOST}:${process.env.PORT}/steam/link_steam_account_reciever/${params._id}`,
+        apiKey: process.env.STEAM_API_KEY as string,
+      }).authenticate(request);
 
-steamController.guard(
-  {
-    verifyToken: true,
-  },
-  (appGuard) =>
-    appGuard.group("/steam", (app) =>
-      //
-      app
-        .get("/connnectSteamAccount", async ({ error, authUser }) => {
-          const redirectUrl = await steamAuth.getRedirectUrl();
-          console.log(redirectUrl);
+      const steamId = steamResponse.steamid,
+        displayName = steamResponse.username,
+        username = steamResponse.profile.split("/").at(-2);
 
-          // Opens the URL in the default browser.
-          await open(`${redirectUrl}&userEmail=${authUser.email}`);
-          //
-          return { payload: "", msg: "Ok" };
-        })
+      const steamUser = await SteamUser.create({ steamId, displayName, username, userId: params._id });
+      // Send response via socket
+
+      return { status: 200, payload: "Conta conectada com sucesso!" };
+    } catch (exception) {
+      console.log(exception);
+      error(500, { error: exception, msg: "" });
+    }
+  })
+  .guard(
+    {
+      verifyToken: true,
+    },
+    (appGuard) =>
+      appGuard.group("/steam", (app) =>
         //
-        .get("/connnectSteamAccountReciever", async ({ request, error }) => {
-          try {
-            const steamUser = await steamAuth.authenticate(request);
+        app
+          .get("/link_steam_account", async ({ authUser, error }) => {
+            try {
+              const steamAuth = new SteamAuth({
+                realm: `${process.env.HOST}:${process.env.PORT}`,
+                returnUrl: `${process.env.HOST}:${process.env.PORT}/steam/link_steam_account_reciever/${authUser._id}`,
+                apiKey: process.env.STEAM_API_KEY as string,
+              });
 
-            console.log(steamUser.steamid);
+              const redirectUrl = await steamAuth.getRedirectUrl();
 
-            return { payload: "", msg: "Ok" };
-          } catch (error) {
-            console.error(error);
-          }
-        })
-    )
-);
+              return { status: 200, payload: redirectUrl, msg: "Ok" };
+            } catch (exception) {
+              error(500, { error: exception, msg: "" });
+            }
+          })
+          .delete("/unlink_steam_account", async ({ authUser, error }) => {
+            try {
+              const steamUser = await SteamUser.deleteOne({ userId: authUser._id });
+
+              return { status: 200, payload: steamUser, msg: "Ok" };
+            } catch (exception) {
+              error(500, { error: exception, msg: "" });
+            }
+          })
+          .get("/get_steam_account", async ({ authUser, error }) => {
+            try {
+              const steamUser = await SteamUser.findOne({ userId: authUser._id });
+
+              return { status: 200, payload: steamUser, msg: "Ok" };
+            } catch (exception) {
+              error(500, { error: exception, msg: "" });
+            }
+          })
+      )
+  );
 
 export default steamController;

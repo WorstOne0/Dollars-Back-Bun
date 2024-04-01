@@ -26,7 +26,7 @@ app.use(
 
 app.use(router);
 
-const server = app.listen(4000, () => {
+const server = app.listen(process.env.PORT!, () => {
   console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 });
 
