@@ -13,7 +13,7 @@ animeController
       console.log("/anime/redirect_mal - headers", headers);
       console.log("/anime/redirect_mal - query", query);
 
-      return { status: 200, payload: "", msg: "" };
+      return { status: 200, payload: "Conta Conectada com Sucesso", msg: "" };
     } catch (exception) {
       console.log("Controller User :: getAll", exception);
       return error(500, { exception, msg: "" });
